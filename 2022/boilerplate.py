@@ -1,13 +1,10 @@
 import sys
+from aochelper import get_data
 
-# Default file to open is inputX.txt with X same as this file
-if len(sys.argv) > 1:
-    filename = f"{sys.argv[1]}.txt"
-else:
-    filename = f"input{__file__.split('.')[0][-1]}.txt"
+lines = get_data(sys.argv)
 
-# Read input file
-with open(filename, "r") as fo:
-    lines = [line.strip('\n') for line in fo.readlines()]
+[print(line) for line in lines[:20]]
 
-[print(line) for line in lines]
+result = None
+
+print("The result is:", result)
