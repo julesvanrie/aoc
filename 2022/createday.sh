@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Determine new folder based on input arguments
 if [ $1 ]; then
   NEW_DIR=$1
@@ -14,11 +16,11 @@ else
 fi
 
 # Clone boilerplate
-if [ -e "$NEW_DIR/solution1.py" ]; then
-  echo "File '$NEW_DIR/solution1.py' exists already"
+if [ -e "$NEW_DIR/solve1.py" ]; then
+  echo "File '$NEW_DIR/solve1.py' exists already"
 else
-  cp boilerplate.py "$NEW_DIR/solution1.py"
-  echo "File '$NEW_DIR/solution1.py' created"
+  cp boilerplate.py "$NEW_DIR/solve1.py"
+  echo "File '$NEW_DIR/solve1.py' created"
 fi
 
 # Test file

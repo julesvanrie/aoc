@@ -5,6 +5,8 @@ lines = get_data(sys.argv)
 
 [print(line) for line in lines[:20]]
 
-result = None
+result1 = None
+result2 = None
 
-print("The result is:", result)
+print("The result is for part 1 is:", result1)
+print("The result is for part 2 is:", result2)
