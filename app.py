@@ -5,6 +5,11 @@ from datetime import datetime
 
 st.title("AOC Interface")
 
+
+#########################
+## Obtaining user info ##
+#########################
+
 today = datetime.now().day
 col1, col2 = st.columns(2)
 
@@ -21,7 +26,6 @@ st.columns(1)
 
 session_cookie = st.text_input(label="[Optional] Your session cookie (for automatic retrieval and answering):").strip()
 
-from solve1 import solve
 
 url = f"https://adventofcode.com/{year}/day/{day}/input"
 st.write(f"Go get your puzzle input here, and copy the input: {url}")
@@ -38,7 +42,13 @@ if session_cookie:
 else:
     lines = st.text_area("Copy the contents of your input file in here and press Ctrl+Enter:").split('\n')
 
-# st.write(lines)
+
+#########################
+## Solve the puzzle    ##
+#########################
+
+
+from solve1 import solve
 
 if len(lines) > 1:
     one, two = solve(lines)
@@ -48,50 +58,49 @@ if len(lines) > 1:
     st.markdown(f"The result for part two is *{two}*.")
     st.markdown("\n")
 
+
+#########################
+## Submit to AOC site  ##
+#########################
+
+
     if session_cookie:
-        st.subheader("Answers from the AOC website for the first part")
+
         url_answer = f"https://adventofcode.com/{year}/day/{day}/answer"
-        data_one = {'level': '1', 'answer': f'{one}'}
-        data_two = {'level': '2', 'answer': f'{two}'}
 
-        result_one = requests.post(url=url_answer,
-                                   data=data_one,
-                                   cookies=cookies,
-                                   headers=headers)
+        parts = [
+            {
+                'level': '1',
+                'answer': str(one),
+                'ord': 'first'
+            },
+            {
+                'level': '2',
+                'answer': str(two),
+                'ord': 'second'
+            },
+        ]
 
-        if "That's the" in result_one.text:
-            st.write("Congratulations. You solved puzzle one...")
+        for part in parts:
 
-        if "That's not the right answer." in result_one.text:
-            st.write("Oops. Seems to be the wrong answer.")
+            st.subheader(f"Answers from the AOC website for the {part['ord']} part")
 
-        if "Did you already complete it?" in result_one.text:
-            st.write("Did you already complete this puzzle?")
+            data = {'level': part['level'], 'answer': part['answer']}
+            # data_two = {'level': '2', 'answer': f'{two}'}
 
-        with st.expander("Open to see full response."):
-            st.code(result_one.text)
+            part['result'] = requests.post(url=url_answer,
+                                    data=data,
+                                    cookies=cookies,
+                                    headers=headers)
 
-        st.subheader("Answers from the AOC website for the second part")
+            if "That's the" in part['result'].text:
+                st.write(f"Congratulations. You solved the {part['ord']} puzzle...")
 
-        with st.spinner("Please wait 10 seconds before we submit part two..."):
-            time.sleep(10)
+            if "That's not the right answer." in part['result'].text:
+                st.write("Oops. Seems to be the wrong answer.")
 
-        result_two = requests.post(url=url_answer,
-                                   data=data_two,
-                                   cookies=cookies,
-                                   headers=headers)
+            if "Did you already complete it?" in part['result'].text:
+                st.write("Did you already complete this puzzle?")
 
-        if "That's the" in result_two.text:
-            st.write("Congratulations. You solved puzzle two...")
-
-        if "That's not the right answer." in result_two.text:
-            st.write("Oops. Seems to be the wrong answer.")
-
-        if "You don't seem to be solving the right level." in result_two.text:
-            st.write("Oops. Submit the first part before the second.")
-
-        if "Did you already complete it?" in result_two.text:
-            st.write("Did you already complete this puzzle?")
-
-        with st.expander("Open to see full response."):
-            st.code(result_two.text)
+            with st.expander("Open to see full response."):
+                st.code(part['result'].text)
