@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import os, time
 from datetime import datetime
+from importlib import import_module
+from params import years, days, headers
 
 st.title("AOC Interface")
 
@@ -14,13 +16,12 @@ today = datetime.now().day
 col1, col2 = st.columns(2)
 
 with col1:
-    year = st.selectbox("Choose year:", ["2022","2021","2020"], index=0)
+    year = st.selectbox("Choose year:", reversed(years.keys()), index=0)
 with col2:
     if int(year) == datetime.now().year:
-        days = [f"{day}" for day in range(1,today+1)]
-    else:
-        days = [f"{day}" for day in range(1,26)]
-    day = st.selectbox("Choose day:", reversed(days), index=0)
+        this_day = min(25, datetime.now().day)
+    options = list(days.keys())[this_day-1::-1]
+    day = st.selectbox("Choose day:", options, index=0)
 
 st.columns(1)
 
@@ -31,7 +32,6 @@ url = f"https://adventofcode.com/{year}/day/{day}/input"
 st.write(f"Go get your puzzle input here, and copy the input: {url}")
 
 if session_cookie:
-    headers = {'User-Agent': 'https://github.com/julesvanrie/aocsl by jules@vanrie.be'}
     cookies = {'session': session_cookie}
 
     result = requests.get(url,
@@ -47,11 +47,14 @@ else:
 ## Solve the puzzle    ##
 #########################
 
-
-from solve1 import solve
+module_name = f'{years[year]}.{days[day]}.solve'
+try:
+    solver = import_module(module_name)
+except:
+    st.error(f"Solution solver not found. Ask Jules ;-).\n{module_name}")
 
 if len(lines) > 1:
-    one, two = solve(lines)
+    one, two = solver.solve(lines)
 
     st.subheader("Solutions to the puzzles")
     st.markdown(f"The result for part one is *{one}*.")
