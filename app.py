@@ -4,6 +4,7 @@ import os, time
 from datetime import datetime
 from importlib import import_module
 from params import years, days, headers
+from random import randint
 
 st.title("AOC Interface")
 
@@ -27,17 +28,14 @@ st.columns(1)
 
 session_cookie = st.text_input(label="[Optional] Your session cookie (for automatic retrieval and answering):").strip()
 
-
 url = f"https://adventofcode.com/{year}/day/{day}/input"
 st.write(f"Go get your puzzle input here, and copy the input: {url}")
 
 if session_cookie:
     cookies = {'session': session_cookie}
-
     result = requests.get(url,
                           cookies=cookies,
                           headers=headers)
-    # st.markdown(result)
     lines = result.text.strip().split('\n')
 else:
     lines = st.text_area("Copy the contents of your input file in here and press Ctrl+Enter:").split('\n')
@@ -86,10 +84,13 @@ if len(lines) > 1:
 
         for part in parts:
 
+            if part['level'] == '2':
+                with st.spinner("Please wait a few minutes before we submit part two..."):
+                    time.sleep(randint(5*60, 8*60))
+
             st.subheader(f"Answers from the AOC website for the {part['ord']} part")
 
             data = {'level': part['level'], 'answer': part['answer']}
-            # data_two = {'level': '2', 'answer': f'{two}'}
 
             part['result'] = requests.post(url=url_answer,
                                     data=data,
