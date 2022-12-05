@@ -36,7 +36,8 @@ to obtain the puzzle input:
 - python solution.py 15       >> get input for day 15 from the AOC website
 - python solution.py 2021 15  >> get input for puzzle 15 of 2021
 
-Now the lines variable contains your puzzle input.
+Now the lines variable contains your puzzle input as one long text.
+You still have to split the lines yourself (this has to be customized per puzzle).
 """
 
 import os, requests
@@ -47,8 +48,8 @@ def _read_file(filename):
     Read lines from a text file called <filename> in the current directory.
     """
     with open(filename, "r") as fo:
-        lines = [line.strip() for line in fo.readlines()]
-    return lines
+        text = fo.read()
+    return text.strip('\n')
 
 def _fetch_input(year, day, write=False):
     """
@@ -70,7 +71,7 @@ def _fetch_input(year, day, write=False):
     if write:
         with open("input.txt", "w") as fo:
             fo.writelines(result.text)
-    return result.text.strip().split('\n')
+    return result.text.strip('\n')
 
 def get_data(sys_argv=[], year=None, day=None):
     """
