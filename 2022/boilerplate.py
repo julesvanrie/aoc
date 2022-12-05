@@ -1,11 +1,11 @@
 import os, sys, timeit
 from aochelper import get_data
 
-def solve(lines):
-    if not lines:
-        lines = get_data(sys.argv)
+def solve(lines=None):
+    text = lines if lines else get_data(sys.argv)
+    lines = text.split('\n')
 
-    [print(line) for line in lines[:20]]
+    [print(line) for line in lines[:10]]
 
     ##########
     # Part 1 #
