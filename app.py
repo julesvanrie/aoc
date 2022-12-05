@@ -36,9 +36,9 @@ if session_cookie:
     result = requests.get(url,
                           cookies=cookies,
                           headers=headers)
-    lines = result.text.strip().split('\n')
+    lines = result.text.strip('\n')
 else:
-    lines = st.text_area("Copy the contents of your input file in here and press Ctrl+Enter:").split('\n')
+    lines = st.text_area("Copy the contents of your input file in here and press Ctrl+Enter:").strip('\n')
 
 
 #########################
@@ -84,27 +84,25 @@ if len(lines) > 1:
 
         for part in parts:
 
-            if part['level'] == '2':
-                with st.spinner("Please wait a few minutes before we submit part two..."):
-                    time.sleep(randint(5*60, 8*60))
+            if st.button(f"Click to submit part {part['level']}"):
 
-            st.subheader(f"Answers from the AOC website for the {part['ord']} part")
+                st.subheader(f"Answers from the AOC website for the {part['ord']} part")
 
-            data = {'level': part['level'], 'answer': part['answer']}
+                data = {'level': part['level'], 'answer': part['answer']}
 
-            part['result'] = requests.post(url=url_answer,
-                                    data=data,
-                                    cookies=cookies,
-                                    headers=headers)
+                part['result'] = requests.post(url=url_answer,
+                                        data=data,
+                                        cookies=cookies,
+                                        headers=headers)
 
-            if "That's the" in part['result'].text:
-                st.write(f"Congratulations. You solved the {part['ord']} puzzle...")
+                if "That's the" in part['result'].text:
+                    st.write(f"Congratulations. You solved the {part['ord']} puzzle...")
 
-            if "That's not the right answer." in part['result'].text:
-                st.write("Oops. Seems to be the wrong answer.")
+                if "That's not the right answer." in part['result'].text:
+                    st.write("Oops. Seems to be the wrong answer.")
 
-            if "Did you already complete it?" in part['result'].text:
-                st.write("Did you already complete this puzzle?")
+                if "Did you already complete it?" in part['result'].text:
+                    st.write("Did you already complete this puzzle?")
 
-            with st.expander("Open to see full response."):
-                st.code(part['result'].text)
+                with st.expander("Open to see full response."):
+                    st.code(part['result'].text)
