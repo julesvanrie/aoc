@@ -1,0 +1,1 @@
+[[next(print(f"Result for part {part} is {i + length}") for i in range(len(line)) if len(set(line[i:i+length])) == length)  for part, length in [(1,4),(2,14)]] for line in open("input.txt").readlines()]
