@@ -86,6 +86,17 @@ if len(lines) > 1:
 
             if st.button(f"Click to submit part {part['level']}"):
 
+                if part['level'] == '2':
+                    if 'one_time' not in st.session_state:
+                        st.warning("It would make sense to first submit the first part, no?")
+                    else:
+                        delta = datetime.now() - st.session_state['one_time']
+                        if delta.seconds < randint(5*60, 10*60):
+                            st.warning("That's a bit quick, don't you think?\nTry again in a few minutes.")
+                else:
+                    st.session_state['one_time'] = datetime.now()
+
+
                 st.subheader(f"Answers from the AOC website for the {part['ord']} part")
 
                 data = {'level': part['level'], 'answer': part['answer']}
