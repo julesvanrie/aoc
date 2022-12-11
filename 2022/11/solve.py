@@ -18,7 +18,8 @@ def solve(lines=None):
         i = t.split('\n')
         monkeys.append({
             'items': [int(item) for item in i[1].split(': ')[1].split(', ')],
-            'op': i[2].split(' = ')[1],
+            'op': i[2].split(' ')[-2],
+            'nb': i[2].split(' ')[-1],
             'test': int(i[3].split(' by ')[1]),
             'true': int(i[4].split('monkey ')[1]),
             'false': int(i[5].split('monkey ')[1]),
@@ -34,13 +35,20 @@ def solve(lines=None):
             insp[i] += len(monkey['items'])
             for _ in range(len(monkey['items'])):
                 old = monkey['items'].pop(0)
-                new = 0
-                new = eval(monkey['op']) // 3
+                nb = monkey['nb']
+                if monkey['op'] == '+':
+                    new = old + int(nb)
+                else:
+                    if nb == 'old':
+                        new = old * old
+                    else:
+                        new = old * int(nb)
+                new = new // 3
                 if new % monkey['test']:
                     monkeys[monkey['false']]['items'].append(new)
                 else:
                     monkeys[monkey['true']]['items'].append(new)
-        # pprint(monkeys)
+        pprint(monkeys)
 
     pprint([monkey['items'] for monkey in monkeys])
 
