@@ -17,7 +17,9 @@ def solve(lines=None):
     for t in monkey_text:
         i = t.split('\n')
         monkeys.append({
-            'items': [int(item) for item in i[1].split(': ')[1].split(', ')],
+            'start': [int(item) for item in i[1].split(': ')[1].split(', ')],
+            'items': [],
+            'operation': i[2].split(' = ')[1],
             'op': i[2].split(' ')[-2],
             'nb': i[2].split(' ')[-1],
             'test': int(i[3].split(' by ')[1]),
@@ -25,32 +27,37 @@ def solve(lines=None):
             'false': int(i[5].split('monkey ')[1]),
         })
 
-    # print(monkeys[0])
+    dividors = [monkey['test'] for monkey in monkeys]
+    for monkey in monkeys:
+        for item in monkey['start']:
+            monkey['items'].append({d: item % d for d in dividors})
+
+
+    print(monkeys[0])
     # breakpoint()
     # while sum(len(i['items']) for i in monkeys):
     insp = [0 for i in range(len(monkeys))]
-    for round in range(20):
-        print(round, end='\r')
+    for round in range(10000):
+        # if print(round, end='\r')
+        # breakpoint()
         for i, monkey in enumerate(monkeys):
             insp[i] += len(monkey['items'])
             for _ in range(len(monkey['items'])):
-                old = monkey['items'].pop(0)
-                nb = monkey['nb']
-                if monkey['op'] == '+':
-                    new = old + int(nb)
-                else:
-                    if nb == 'old':
-                        new = old * old
-                    else:
-                        new = old * int(nb)
-                new = new // 3
-                if new % monkey['test']:
+                olditems = monkey['items'].pop(0)
+                new = {k: eval(monkey['operation']) % k for k, old in olditems.items()}
+                # nb = monkey['nb']
+                # if monkey['op'] == '+':
+                #     new = {k: (o + int(nb)) % k for k, o in old.items()}
+                # else:
+                #     new = old
+                # new = new // 3
+                if new[monkey['test']]:
                     monkeys[monkey['false']]['items'].append(new)
                 else:
                     monkeys[monkey['true']]['items'].append(new)
-        pprint(monkeys)
+        # pprint(monkeys)
 
-    pprint([monkey['items'] for monkey in monkeys])
+    # pprint([monkey['items'] for monkey in monkeys])
 
     print(insp)
 
