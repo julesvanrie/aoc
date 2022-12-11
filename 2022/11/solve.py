@@ -36,8 +36,6 @@ def solve(lines=None):
                 else:
                     monkeys[monkey['true']]['items'].append(new)
 
-
-    print(insp)
     result1 = sorted(insp)[-1] * sorted(insp)[-2]
 
 
@@ -65,6 +63,7 @@ def solve(lines=None):
 
     insp = [0 for i in range(len(monkeys))]
     for round in range(10000):
+        print(round, end='\r')
         for i, monkey in enumerate(monkeys):
             insp[i] += len(monkey['items'])
             for _ in range(len(monkey['items'])):
@@ -74,15 +73,6 @@ def solve(lines=None):
                     monkeys[monkey['false']]['items'].append(new)
                 else:
                     monkeys[monkey['true']]['items'].append(new)
-
-
-
-    result2 = sorted(insp)[-1] * sorted(insp)[-2]
-
-
-
-
-    print(insp)
 
     result2 = sorted(insp)[-1] * sorted(insp)[-2]
 
