@@ -2,6 +2,8 @@ import os, sys, timeit
 from aochelper import get_data
 
 def solve(lines=None):
+    # with open("input.txt") as fo:
+    #     lines = fo.read().strip('\n').split('\n')
     text = lines if lines else get_data(sys.argv)
     lines = text.split('\n')
 
