@@ -73,8 +73,9 @@ def solve(lines=None):
             # print(opened)
         if set(opened) == set(working):
             # breakpoint()
-            new_pressure = states[state] + sum(flows[op] for op in opened)
-            return {(state[0], tuple(opened), state[2]+1): new_pressure}
+            new_pressure = states[state] \
+                         + sum(flows[op] for op in opened) * (31 - state[2])
+            return {(state[0], tuple(opened), 31): new_pressure}
         if state[0] != 'AA' and state[0] not in opened:
             new_pressure = states[state] + sum(flows[op] for op in opened) #+ flows[state[0]]
             if not state[1]:
@@ -133,7 +134,7 @@ def solve(lines=None):
 def time():
     with open(os.devnull, 'w') as out:
         sys.stdout = out
-        number = 20
+        number = 1
         timing = timeit.timeit(solve, number=number) / number
         sys.stdout = sys.__stdout__
     print(f"This took {timing:.6f} seconds")
