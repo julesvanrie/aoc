@@ -130,7 +130,7 @@ def solve(lines=None):
                 rock.move_down()
 
             # Check previous state for repeating patterns
-            state = (Rock.top_rows, rock.type, Rock.jet_stage)
+            state = Rock.top_rows
             prev_i, prev_height = Rock.states.get(state, (None, None))
             # If there is a previous state, fast-forward
             if prev_i:
