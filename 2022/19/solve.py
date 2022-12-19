@@ -46,13 +46,15 @@ def solve(lines=None):
     def run(bpnmbr, times):
         robots = MiningTuple(1,0,0,0)
 
-        resources = (0,0,0)
+        resources = (0,0,0,0)
 
 
         bp = blueprints[bpnmbr]
 
         states = {(robots, resources): 0}
-        tried = []
+
+        # We'll keep track of earlier visited states
+        visited = set()
         max_costs = MiningTuple(*[max([bp[j][i] for j in range(4)]) for i in range(4)])
 
         for m in range(1,times):
@@ -65,6 +67,8 @@ def solve(lines=None):
             # if not len(states):
             #     breakpoint()
             for state in states:
+                if state in visited:
+                    continue
                 robots, resources = state
                 resources = MiningTuple(resources[0], resources[1], resources[2], states[state])
 
@@ -100,7 +104,7 @@ def solve(lines=None):
                         continue
 
                     # Add new state
-                    new_state = (new_robots, (new_resources[0], new_resources[1], new_resources[2]))
+                    new_state = (new_robots, (new_resources[0], new_resources[1], new_resources[2], new_resources[3]))
                     choice = 'new'
                     if new_state in new_states:
                         if new_states[new_state] > getattr(new_resources,'geode'):
@@ -119,6 +123,8 @@ def solve(lines=None):
                     if created_one and cand in [3,0]:
                         break
 
+                visited.add(state)
+
             states = new_states
         print(max(states.values()))
         return max(states.values())
@@ -128,14 +134,14 @@ def solve(lines=None):
     # Part 1 #
     ##########
 
-    # results = []
-    # for i in range(len(blueprints)):
-    #     # breakpoint()
-    #     results.append((i+1)*run(i, 25))
+    results = []
+    for i in range(len(blueprints)):
+        # breakpoint()
+        results.append((i+1)*run(i, 25))
 
-    # result1 = sum(results)
+    result1 = sum(results)
 
-    # print("The result is for part 1 is:", result1)
+    print("The result is for part 1 is:", result1)
 
 
     ##########
