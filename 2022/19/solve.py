@@ -4,23 +4,19 @@ import re
 from collections import namedtuple
 from pprint import pprint
 
-MiningTuple = namedtuple('MiningTuple', ['ore','clay','obsidian','geode'])
-
-MiningTuple.__add__ = lambda left, right: \
-    MiningTuple(*[left[i] + right[i] for i in range(len(left))])
-
-MiningTuple.__sub__ = lambda left, right: \
-    MiningTuple(*[left[i] - right[i] for i in range(len(left))])
-
-MiningTuple.__gt__ = lambda left, right: \
-    all(left[i] >= right[i] for i in range(len(left))) and \
-    any(left[i] > right[i] for i in range(len(left)))
-
 def solve(lines=None):
     # with open("input.txt") as fo:
     #     lines = fo.read().strip('\n').split('\n')
     text = lines if lines else get_data(sys.argv)
     lines = text.split('\n')
+
+    # Creating a namedtuple, because we can
+    MiningTuple = namedtuple('MiningTuple', ['ore','clay','obsidian','geode'])
+    # Overloading operators so I can do a simple + and - to add up the elements
+    MiningTuple.__add__ = lambda left, right: \
+        MiningTuple(*[left[i] + right[i] for i in range(len(left))])
+    MiningTuple.__sub__ = lambda left, right: \
+        MiningTuple(*[left[i] - right[i] for i in range(len(left))])
 
     # Parsing blueprints
     blueprints = []
@@ -34,6 +30,7 @@ def solve(lines=None):
         blueprints.append(MiningTuple(**blueprint))
 
 
+    # Create a new robot, and return updated inventories
     def birth(type, robots, resources, blueprint=0):
         cost = blueprints[blueprint][type]
         if all(resources[i] >= cost[i] for i in range(4)):
@@ -46,8 +43,9 @@ def solve(lines=None):
     def run(bpnmbr, times):
         robots = MiningTuple(1,0,0,0)
 
-        resources = (0,0,0,0)
-
+        # Originally used my MiningTuple here too, but that created too many
+        # states, and a flaw in my logic, I think now
+        resources = (0,0,0)
 
         bp = blueprints[bpnmbr]
 
@@ -57,31 +55,21 @@ def solve(lines=None):
         visited = set()
         max_costs = MiningTuple(*[max([bp[j][i] for j in range(4)]) for i in range(4)])
 
-        for m in range(1,times):
+        for m in range(1, times+1):
             print('====== blueprint', bpnmbr, '======', m, '============', end='\r')
-            possible = list(range(len(robots)))
             new_states = {}
-            # if m >= 1:
-            #     breakpoint()
             current_max = max(states.values())
-            # if not len(states):
-            #     breakpoint()
             for state in states:
                 if state in visited:
                     continue
                 robots, resources = state
                 resources = MiningTuple(resources[0], resources[1], resources[2], states[state])
-
-                # Collect resources
-                # for i, res in enumerate(robots):
-                #     resources[i] += robots[i]
-
                 created_one = False
 
                 # Try building different robots
                 # At a certain time, stop building the basic bots
-                # (9 minutes before the end worked for me)
-                if m < times - 9:
+                # (5/9 minutes before the end worked for me for part 1/2)
+                if m < times - 5 if times < 30 else 9:
                     cands = [3,2,1,0,-1]
                 else:
                     cands = [3,2,-1]
@@ -93,33 +81,30 @@ def solve(lines=None):
                         if result := birth(cand, robots, resources, blueprint=bpnmbr):
                             new_robots, new_resources = result
 
-
+                    # Let the robots do their mining
                     new_resources = new_resources + robots
-                    # MiningTuple(*[res + robots[i] for i, res in enumerate(new_resources)])
-                    # if getattr(resources,'geode') < current_max:
-                    #     continue
 
                     # Skip if we're far behind best so far
                     if new_resources.geode < current_max - 3:
                         continue
 
                     # Add new state
-                    new_state = (new_robots, (new_resources[0], new_resources[1], new_resources[2], new_resources[3]))
+                    new_state = (new_robots, (new_resources[0], new_resources[1], new_resources[2]))
                     choice = 'new'
                     if new_state in new_states:
-                        if new_states[new_state] > getattr(new_resources,'geode'):
+                        if new_states[new_state] > new_resources.geode:
                             choice = 'current'
                     if prev_state := states.get(state, False):
-                        if prev_state >= getattr(new_resources,'geode'):
+                        if prev_state >= new_resources.geode:
                             choice = 'old'
                     if choice == 'new':
-                        new_states[new_state] = getattr(new_resources,'geode')
+                        new_states[new_state] = new_resources.geode
 
-                    if result:
-                        created_one = True
                     # Some heuristics:
                     # - If a bot was created, don't go down the path of not creating one
                     # - If a geode or obsidian bot can be made, do so
+                    if result:
+                        created_one = True
                     if created_one and cand in [3,0]:
                         break
 
@@ -130,29 +115,23 @@ def solve(lines=None):
         return max(states.values())
 
 
-    ##########
     # Part 1 #
-    ##########
-
     results = []
     for i in range(len(blueprints)):
         # breakpoint()
-        results.append((i+1)*run(i, 25))
+        results.append((i+1)*run(i, 24))
 
     result1 = sum(results)
 
     print("The result is for part 1 is:", result1)
 
 
-    ##########
     # Part 2 #
-    ##########
-
     results = []
     result2 = 1
     for i in range(min(3, len(blueprints))):
         # breakpoint()
-        tmp = run(i, 33)
+        tmp = run(i, 32)
         results.append(tmp)
         result2 *= tmp
 
