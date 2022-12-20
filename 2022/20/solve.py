@@ -7,74 +7,59 @@ def solve(lines=None):
     text = lines if lines else get_data(sys.argv)
     lines = text.split('\n')
 
-    numbers = [*map(int, lines)]
 
-    ##########
-    # Part 1 #
-    ##########
+    def run(numbers, location, lookup):
+        """One run of mixing
+        """
+        for i in range(length := len(numbers)):
+            n = numbers[i]
+            cur_loc = location[i]
+            fut_loc = (cur_loc + n) % (length - 1)
 
-    length = len(numbers)
-    # Storing locations of original numbers. Key is original location
-    location = {i: i for i in range(length)}
-    # Lookup, basically the reverse lookup of location
-    lookup = {i: i for i in range(length)}
+            if fut_loc > cur_loc:
+                rng = range(cur_loc+1, fut_loc+1)
+                dir = -1
+            else:
+                rng = range(fut_loc, cur_loc)
+                dir = 1
+            for j in rng:
+                location[lookup[j]] = (location[lookup[j]] + dir) % length
+            location[i] = fut_loc
 
-    def modu(number, div):
-        """Sort of a custom made modulo operation to determine new location.
-        A number equal to lenght doesn't wrap around to exactly the same location."""
-        if number > div:
-            return (number + number // div) % div
-        elif number > 0:
-            return number % div
-        else:
-            return (number - abs(number) // div - 1) % div
+            lookup = {v: k for k, v in location.items()}
 
-    if length <10:
-        print(numbers)
-
-    for i in range(length):
-
-        n = numbers[i]
-
-        cur_loc = location[i]
-        fut_loc = modu(cur_loc + n, length)
-
-        if fut_loc > cur_loc:
-            rng = range(cur_loc+1, fut_loc+1)
-            dir = -1
-        else:
-            rng = range(fut_loc, cur_loc)
-            dir = 1
-        for j in rng:
-            location[lookup[j]] = (location[lookup[j]] + dir) % length
-        location[i] = modu((location[i] + n), length)
+        return location, lookup
 
 
+    def part(part):
+        """Run for part 1 or 2
+        """
+        numbers = [*map(int, lines)]
+        length = len(numbers)
 
-        lookup = {v: k for k, v in location.items()}
+        # Storing locations of original numbers. Key is original location
+        location = {i: i for i in range(length)}
+        # Lookup, basically the reverse lookup of location
+        lookup = {i: i for i in range(length)}
 
-        if length <10:
-            new = [numbers[lookup[j]] for j in range(length)]
-            print(i, min(lookup.keys()), max(lookup.keys()), len(lookup), new)
+        if part == 2:
+            numbers = [n * 811589153 for n in numbers]
 
+        for i in range(10 if part == 2 else 1, 0, -1):
+            print("===", i-1 , "left after this round ===", end=('\n' if i == 1 else '\r'))
+            location, lookup = run(numbers, location, lookup)
 
+        new_order = [numbers[lookup[j]] for j in range(length)]
 
-    new = [numbers[lookup[j]] for j in range(length)]
+        results = [new_order[(new_order.index(0) + i*1000) % length] for i in [1,2,3]]
 
-    results = [new[(new.index(0) + i*1000) % len(new)] for i in [1,2,3]]
+        return sum(results)
 
-    result1 = sum(results)
+    result1 = part(1)
+    print("The result for part 1 is:", result1)
 
-    ##########
-    # Part 2 #
-    ##########
-
-
-
-    result2 = None
-
-    print("The result is for part 1 is:", result1)
-    print("The result is for part 2 is:", result2)
+    result2 = part(2)
+    print("The result for part 2 is:", result2)
 
     return result1, result2
 
