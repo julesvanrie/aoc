@@ -26,6 +26,7 @@ def solve(lines=None):
                 tbd[key] = value
         return known, tbd
 
+
     def op(left, right, op):
         if op == '+':
             return known[left] + known[right]
@@ -37,11 +38,6 @@ def solve(lines=None):
             return (known[left] / known[right])
 
 
-
-    ##########
-    # Part 1 #
-    ##########
-
     def calc(root, tree=None):
         if not tree:
             tree = set(tbd.keys())
@@ -52,25 +48,27 @@ def solve(lines=None):
                         known[monkey] = op(value[0], value[2], value[1])
                 if root in known:
                     break
-
-            # if 'root' in known:
-            #     break
         return known[root]
 
-    initiate()
 
-    result1 = calc('root')
+
+    # Part 1
+
+    initiate()
+    result1 = int(calc('root'))
     print("The result is for part 1 is:", result1)
 
-    ##########
-    # Part 2 #
-    ##########
+
+
+    # Part 2
 
     initiate()
     firsttree = set()
     human_tree_nb = 2
 
     def find(root):
+        """Used to create one side of the tree
+        """
         left = tbd[root][0]
         right = tbd[root][2]
         if left == 'humn' or right == 'humn':
@@ -83,36 +81,34 @@ def solve(lines=None):
             firsttree.add(right)
             find(right)
 
+
     find(tbd['root'][0])
     firsttree.add(tbd['root'][0])
 
     if human_tree_nb == 0:
         human_tree = firsttree
-        monkey_tree = set(tbd.keys()) -  firsttree
         human_tree_root = tbd['root'][0]
         monkey_tree_root = tbd['root'][2]
     else:
-        monkey_tree = firsttree
         human_tree = set(tbd.keys()) -  firsttree
         human_tree_root = tbd['root'][2]
         monkey_tree_root = tbd['root'][0]
 
     monkey_tree_result = calc(monkey_tree_root)
-    print('monkey', monkey_tree_result)
 
-    check = False
-
-
-    def target(start=0, end= 1_000_000_000_000_000):
+    def target(start=0, end=10_000_000_000_000):
+        """Binary search to get the right human input
+        """
         test = [start, ((start+end)/2), end]
         results = []
         for t in test:
             initiate()
             known['humn'] = t
             results.append(calc(human_tree_root, human_tree))
-        print(monkey_tree_result, results)
+        # If we found it
         if monkey_tree_result in results:
-            return test[results.index(monkey_tree_result)]
+            return int(test[results.index(monkey_tree_result)])
+        # If not, pick the right new interval
         if monkey_tree_result > results[0] and monkey_tree_result < results[1]:
             return target(start=test[0], end=test[1])
         if monkey_tree_result < results[0] and monkey_tree_result > results[1]:
@@ -121,14 +117,10 @@ def solve(lines=None):
             return target(start=test[1], end=test[2])
         if monkey_tree_result < results[1] and monkey_tree_result > results[2]:
             return target(start=test[1], end=test[2])
-
-        # check = human_tree_result == monkey_tree_result
-        # print(monkey_tree_result, human_tree_result)
-
+        return "Not found, adjust the start interval"
 
 
     result2 = target()
-
     print("The result is for part 2 is:", result2)
 
     return result1, result2
