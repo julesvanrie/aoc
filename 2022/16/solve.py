@@ -1,5 +1,6 @@
 import os, sys, timeit
 from aochelper import get_data
+from datetime import datetime
 
 def solve(lines=None):
     # with open("input.txt") as fo:
@@ -14,20 +15,12 @@ def solve(lines=None):
         flows[valve] = int(line.split(';')[0].split('=')[1])
 
     working = [k for k, v in flows.items() if v]
-    # print(flows['DD'], connections['DD'])
-    print(working)
+
     ##########
     # Part 1 #
     ##########
 
-
-    paths = {}
-    opened = working.copy()
-
-
-
     def shortest(head, tail, visited):
-        # breakpoint()
         short = 2000
         if tail in connections[head]:
             return 1
@@ -39,94 +32,49 @@ def solve(lines=None):
                 short = new
             if new == 2:
                 return 2
-
         return short
 
 
-    # print(shortest('AA','BB'))
-    # print(shortest('AA','HH', []))
-
+    # Distances key is head, tail. Value is shortest distance.
     distances = {}
-    working_connections = {}
     for head in working + ['AA']:
-        temp = []
         for tail in working:
             if head != tail:
-                distances[(head, tail)] = shortest(head, tail, [])
-                temp.append(tail)
-        working_connections[head] = temp
-
-    print(working_connections)
-
-    # print(distances)
-
-    states = {('AA', None, 1): 0}
+                if (tail,head) in distances:
+                    distances[(head, tail)] = distances[(tail, head)]
+                else:
+                    distances[(head, tail)] = shortest(head, tail, [])
 
 
-    def add_states(state):
-        new_states = {}
-        # breakpoint()
-        if not state[1]:
-            opened = []
-        else:
-            opened = list(state[1])
-            # print(opened)
-        if set(opened) == set(working):
-            # breakpoint()
-            new_pressure = states[state] \
-                         + sum(flows[op] for op in opened) * (31 - state[2])
-            return {(state[0], tuple(opened), 31): new_pressure}
-        if state[0] != 'AA' and state[0] not in opened:
-            new_pressure = states[state] + sum(flows[op] for op in opened) #+ flows[state[0]]
-            if not state[1]:
-                new_opened = (state[0],)
-            else:
-                new_opened = tuple(opened + [state[0]])
-            new_states[(state[0], new_opened, state[2] + 1)] = new_pressure
-        if state[0] in opened:
-            new_pressure = states[state] + sum(flows[op] for op in opened)
-            new_states[(state[0], tuple(opened), state[2] + 1)] = new_pressure
-        # print(state)
-        for conn in working_connections[state[0]]:
-            new_opened = tuple(opened)
-            duration = min(distances[(state[0], conn)], 31-state[2])
-            # breakpoint()
-            new_minute = state[2] + duration
-            new_pressure = states[state] + sum(flows[op] for op in opened) * (duration)
-            new_states[(conn, new_opened, new_minute)] = new_pressure
-        return new_states
+    def find(start='AA', minutes=30, opened=[], part=1):
+        if minutes <= 0:
+            return 0
 
-    for m in range(1, 31, +1):
-        print(m, len(states))
-        # breakpoint()
-        new_states = {}
-        keep_states = {}
-        for state in states:
-            if state[2] != m:
-                keep_states[state] =  states[state]
-                continue
-            for k, v in add_states(state).items():
-                new_states[k] = v
-        for k,v in keep_states.items():
-            new_states[k] = v
-        states = new_states
+        if len(opened) == len(working):
+            return minutes * sum(flows[valve] for valve in opened)
+
+        options = {}
+        for valve in working:
+            if valve not in opened:
+                distance = 1 if start == valve else distances[(start, valve)] + 1
+                base = min(distance, minutes) * sum(flows[valve] for valve in opened)
+                options[valve] = base + find(start=valve,
+                                             minutes=minutes-distance,
+                                             opened=opened+[valve])
+        return max(options.values())
 
 
-    # print(states)
-    print(max(states.values()))
+    result1 = find('AA')
+    print("The result is for part 1 is:", result1)
 
-
-    result1 = None
 
     ##########
     # Part 2 #
     ##########
 
 
-
     result2 = None
 
-    print("The result is for part 1 is:", result1)
     print("The result is for part 2 is:", result2)
 
     return result1, result2
