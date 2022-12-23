@@ -72,8 +72,86 @@ def solve(lines=None):
     # Part 2 #
     ##########
 
+    current_max = 0
 
-    result2 = None
+    def find2(start='AA', minutes=26, opened=[], next=None, step=None, ref=0):
+        nonlocal current_max
+
+        if minutes == 0:
+            return 0
+
+        if len(opened) == len(working):
+            # print('reached an end')
+            return minutes * sum(flows[valve] for valve in opened)
+
+        if ref + minutes * sum(flows[valve] for valve in working) < current_max:
+            # print('reached an impossible end')
+            return 0
+
+        options = {}
+        for valve in working:
+            if valve not in opened:
+                # if valve == start or valve == next:
+                #     continue
+                if valve == next:
+                    if len(working) - len(opened) == 1:
+                        base = min(step, minutes) * sum(flows[valve] for valve in opened)
+                        options[(start, valve)] = base + find2(start=next,
+                                             minutes=max(0,minutes-step),
+                                             opened=opened+[next],
+                                             next=None,
+                                             step=None,
+                                             ref=ref+base)
+                    else:
+                        continue
+                if not next:
+                    distance = 1 if start == valve else distances[(start, valve)] + 1
+                    options[(start, valve)] = find2(start=start,
+                                             minutes=minutes,
+                                             opened=opened,
+                                             next=valve,
+                                             step=distance)
+                else:
+                    # if valve == next:
+                    #     continue
+                    distance = 1 if start == valve else distances[(start, valve)] + 1
+                    # if distance == step:
+                    #     base = min(distance, minutes) * sum(flows[valve] for valve in opened)
+                    #     options[(valve, next)] = base + find2(start=valve,
+                    #                          minutes=minutes-distance,
+                    #                          opened=opened+[valve, next],
+                    #                          next=next,
+                    #                          step=0)
+                    #     continue
+                    # if distance == step:
+                    #     continue
+                    if distance < step:
+                        next_step = step - distance
+                        first_valve = valve
+                        next_valve = next
+                    else:
+                        next_step = distance - step
+                        distance = step
+                        first_valve = next
+                        next_valve = valve
+                    base = min(distance, minutes) * sum(flows[valve] for valve in opened)
+                    options[(first_valve, next_valve)] = base + find2(start=first_valve,
+                                             minutes=max(0,minutes-distance),
+                                             opened=opened+[first_valve],
+                                             next=next_valve,
+                                             step=next_step,
+                                             ref=ref+base)
+        result = max(options.values())
+        if ref + result > current_max:
+            current_max = ref + result
+            print(current_max, end='\r')
+        if options:
+            return result
+        else:
+            return 0
+
+
+    result2 = find2()
 
     print("The result is for part 2 is:", result2)
 
