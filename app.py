@@ -45,7 +45,7 @@ else:
 ## Solve the puzzle    ##
 #########################
 
-module_name = f'{years[year]}.{days[day]}.solve'
+module_name = f'aoc{year[-2:]}.day{day}.solve'
 try:
     solver = import_module(module_name)
 except:
