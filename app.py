@@ -1,10 +1,10 @@
 import streamlit as st
 import requests
-import os, time
 from datetime import datetime
 from importlib import import_module
 from params import years, days, headers
 from random import randint
+
 
 st.title("AOC Interface")
 
@@ -81,6 +81,8 @@ if len(lines) > 1:
                 'ord': 'second'
             },
         ]
+
+
 
         for part in parts:
 
