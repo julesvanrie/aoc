@@ -2,9 +2,9 @@
 
 # Determine new folder based on input arguments
 if [ $1 ]; then
-  NEW_DIR=$1
+  NEW_DIR=day$1
 else
-  NEW_DIR=$(date +%d)
+  NEW_DIR=day$(date +%d)
 fi
 
 # Create new dir
@@ -19,7 +19,7 @@ fi
 if [ -e "$NEW_DIR/solve.py" ]; then
   echo "File '$NEW_DIR/solve.py' exists already"
 else
-  cp boilerplate.py "$NEW_DIR/solve.py"
+  cp ../boilerplate.py "$NEW_DIR/solve.py"
   echo "File '$NEW_DIR/solve.py' created"
 fi
 
