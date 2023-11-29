@@ -2,3 +2,4 @@
 .python-version
 **/*.out
 **/.vscode
+.env
