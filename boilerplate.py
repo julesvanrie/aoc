@@ -1,45 +1,21 @@
-import os, sys, timeit
-from aochelper import get_data
+import sys
+from aocsolution.basesolution import BaseSolution
 
-def solve(lines=None):
-    # with open("input.txt") as fo:
-    #     lines = fo.read().strip('\n').split('\n')
-    text = lines if lines else get_data(sys.argv)
-    lines = text.split('\n')
+class Solution(BaseSolution):
 
-    [print(line) for line in lines[:10]]
+    @BaseSolution.time_this
+    def solve_one(self):
+        result = None
+        return result
 
-    ##########
-    # Part 1 #
-    ##########
-
-
-    result1 = None
-    print("The result is for part 1 is:", result1)
-
-    ##########
-    # Part 2 #
-    ##########
-
-
-    result2 = None
-    print("The result is for part 2 is:", result2)
-
-    return result1, result2
-
-
-def time():
-    with open(os.devnull, 'w') as out:
-        sys.stdout = out
-        number = 20
-        timing = timeit.timeit(solve, number=number) / number
-        sys.stdout = sys.__stdout__
-    print(f"This took {timing:.6f} seconds")
-
+    @BaseSolution.time_this
+    def solve_two(self):
+        result = None
+        return result
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1][:4] == "time":
-        del sys.argv[1]
-        time()
-    else:
-        solve()
+    test = len(sys.argv) > 1 and 'test' in sys.argv[1]
+    timing = len(sys.argv) > 1 and 'time' in sys.argv[1]
+    solution = Solution(test=test)
+    print("The result for part 1 is:", solution.solve_one())
+    print("The result for part 2 is:", solution.solve_two())

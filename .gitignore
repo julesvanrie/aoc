@@ -2,3 +2,5 @@
 .python-version
 **/*.out
 **/.vscode
+.env
+**/*.egg-info/
