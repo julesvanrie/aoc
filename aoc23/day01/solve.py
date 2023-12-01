@@ -1,6 +1,8 @@
 import sys
 from aocsolution.basesolution import BaseSolution
 
+import re
+
 class Solution(BaseSolution):
 
     @BaseSolution.time_this
@@ -27,34 +29,20 @@ class Solution(BaseSolution):
     def solve_two(self):
         result = 0
         input = self.get_data()
+
+        pattern = "one|two|three|four|five|six|seven|eight|nine"
+
+        numbers = {txt: n for txt, n in zip(pattern.split('|'), range(1,10))}
+
+        pattern_left = r"\d|" + pattern
+        pattern_right = r"\d|" + pattern[::-1]
+
         for line in input:
-            letters = ['one', 'two', 'three', 'four', 'five',
-                       'six', 'seven', 'eight', 'nine']
-            number = ''
+            left = re.search(pattern_left, line).group()
+            right = re.search(pattern_right, line[::-1]).group()
+            result += 10 * int(numbers.get(left, left)) \
+                     + 1 * int(numbers.get(right[::-1], right))
 
-            for i in range(len(line)):
-                if line[i].isdigit():
-                    number += line[i]
-                    break
-                for n, ntxt in enumerate(letters, 1):
-                    if line[i:].startswith(ntxt):
-                        number += str(n)
-                        break
-                if number:
-                    break
-
-            for i in range(len(line)-1, -1, -1):
-                if line[i].isdigit():
-                    number += line[i]
-                    break
-                for n, ntxt in enumerate(letters, 1):
-                    if line[:i+1].endswith(ntxt):
-                        number += str(n)
-                        break
-                if len(number) > 1:
-                    break
-
-            result += int(number)
         return result
 
 if __name__ == "__main__":
