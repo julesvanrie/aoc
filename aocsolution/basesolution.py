@@ -1,4 +1,5 @@
 import os, sys
+import inspect
 import requests
 from datetime import datetime
 import time
@@ -42,9 +43,7 @@ class BaseSolution():
     def __init__(self, year=None, day=None, test=False):
         self.year = year if year else datetime.now().year
         self.day = day if day else datetime.now().day
-        # self.path = os.path.dirname(__file__)
-        self.input_path = "test.txt" if test else "input.txt"
-        self.input = self.get_data()
+        self.test = test
 
 
     def get_data(self, split=True):
@@ -57,12 +56,16 @@ class BaseSolution():
         If split is True: returns a list of lines
         If split is False: returns one long string for custom splitting
         """
+        if self.test:
+            input_path = f"test_{inspect.stack()[1].function[-3:]}.txt"
+        else:
+            input_path = "input.txt"
         try: # To read from file
-            self.__print('File', self.input_path)
-            input = self._read_file(self.input_path)
+            self.__print('File', input_path)
+            input = self._read_file(input_path)
         except: # Fetch today's puzzle from site and save file
-            self.__print('Fetched ', self.year, '- day', self.day, 'and saved to', self.input_path)
-            input = self._fetch_input(write=True)
+            self.__print('Fetched ', self.year, '- day', self.day, 'and saved to', input_path)
+            input = self._fetch_input(filename=input_path)
 
         if split:
             return input.split("\n")
@@ -78,7 +81,7 @@ class BaseSolution():
         return text.strip('\n')
 
 
-    def _fetch_input(self, write=False):
+    def _fetch_input(self, filename=None):
         """
         Get the input from the Advent of Code website.
         Reads the session cookie from an environment variable called AOC_SESSION
@@ -96,8 +99,8 @@ class BaseSolution():
                 "Check if you provided a session cookie and it is still valid.\n" +
                 "If that's not the cause, have fun debugging!\n")
 
-        if write:
-            with open(self.input_path, "w") as fo:
+        if filename:
+            with open(filename, "w") as fo:
                 fo.writelines(result.text)
 
         return result.text.strip('\n')
