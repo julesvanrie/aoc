@@ -9,6 +9,9 @@ class Solution(BaseSolution):
         limits = {'red': 12, 'green': 13, 'blue': 14}
         input = self.get_data()
         games = [inp.split(": ")[1] for inp in input]
+
+        # Make a list with the outcomes for each game
+        # Each outcome will be a dict with numbers for each color in this game
         outcomes = []
         for game in games:
             outcome = {
@@ -16,16 +19,21 @@ class Solution(BaseSolution):
                 'green': [],
                 'blue': []
             }
+            # Add the numbers of each set to the appropriate color
             for set in game.split("; "):
                 for color in set.split(", "):
-                    outcome[color.split(" ")[1]].append(int(color.split(" ")[0]))
+                    number, col = color.split(" ")
+                    outcome[col].append(int(number))
             outcomes.append(outcome)
 
+        # Loop over the outcomes
+        # If it's a valid game, add the id to the result
         for id, outcome in enumerate(outcomes, 1):
             valid = True
-            for key, value in limits.items():
-                if max(outcome[key]) > value:
+            for color, limit in limits.items():
+                if max(outcome[color]) > limit:
                     valid = False
+                    continue
             if valid:
                 result += id
 
@@ -33,10 +41,13 @@ class Solution(BaseSolution):
 
     @BaseSolution.time_this
     def solve_two(self):
-        result = 0
+        result = [0, 0]
         limits = {'red': 12, 'green': 13, 'blue': 14}
         input = self.get_data()
         games = [inp.split(": ")[1] for inp in input]
+
+        # Make a list with the outcomes for each game
+        # Each outcome will be a dict with numbers for each color in this game
         outcomes = []
         for game in games:
             outcome = {
@@ -44,17 +55,26 @@ class Solution(BaseSolution):
                 'green': [],
                 'blue': []
             }
+            # Add the numbers of each set to the appropriate color
             for set in game.split("; "):
                 for color in set.split(", "):
-                    outcome[color.split(" ")[1]].append(int(color.split(" ")[0]))
+                    number, col = color.split(" ")
+                    outcome[col].append(int(number))
             outcomes.append(outcome)
-            print(outcome)
 
+        # Loop over the outcomes
+        # If it's a valid game, add the id to the result
+        # At the same time calculate the power based on the max number
         for id, outcome in enumerate(outcomes, 1):
             power = 1
-            for key, value in limits.items():
-                power *= max(outcome[key])
-            result += power
+            valid = True
+            for color, limit in limits.items():
+                if max(outcome[color]) > limit:
+                    valid = False
+                power *= max(outcome[color])
+            result[1] += power
+            if valid:
+                result[0] += id
 
         return result
 
