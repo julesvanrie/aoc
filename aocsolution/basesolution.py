@@ -63,6 +63,8 @@ class BaseSolution():
         try: # To read from file
             self.__print('File', input_path)
             input = self._read_file(input_path)
+            if input_path == "test_two.txt" and not input:
+                input = self._read_file("test_one.txt")
         except: # Fetch today's puzzle from site and save file
             self.__print('Fetched ', self.year, '- day', self.day, 'and saved to', input_path)
             input = self._fetch_input(filename=input_path)
@@ -127,6 +129,6 @@ class BaseSolution():
             start = time.time()
             result = func(*args, **kwargs)
             end = time.time()
-            print(f"This took {(end-start) // 60} minutes, {round((end - start) % 60, 2)} seconds")
+            print(f"This took {(end-start) // 60} minutes, {round((end - start) % 60, 6)} seconds")
             return result
         return wrapper
