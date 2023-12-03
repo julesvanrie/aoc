@@ -1,17 +1,23 @@
 import sys
 from aocsolution.basesolution import BaseSolution
 
+
+@BaseSolution.time_this
+def solve_one(self):
+    result = None
+    return result
+
+
+@BaseSolution.time_this
+def solve_two(self):
+    result = None
+    return result
+
+
 class Solution(BaseSolution):
+    solve_one = solve_one
+    solve_two = solve_two
 
-    @BaseSolution.time_this
-    def solve_one(self):
-        result = None
-        return result
-
-    @BaseSolution.time_this
-    def solve_two(self):
-        result = None
-        return result
 
 if __name__ == "__main__":
     test = len(sys.argv) > 1 and 'test' in sys.argv[1]
