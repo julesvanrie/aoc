@@ -1,16 +1,19 @@
 import sys
 from aocsolution.basesolution import BaseSolution
 
+import re
 
 @BaseSolution.time_this
 def solve_one(self):
-    result = None
+    result = 0
+    input = self.get_data()
     return result
 
 
 @BaseSolution.time_this
 def solve_two(self):
-    result = None
+    result = 0
+    input = self.get_data()
     return result
 
 
