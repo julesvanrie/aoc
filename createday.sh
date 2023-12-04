@@ -24,11 +24,19 @@ else
 fi
 
 # Test file
-if [ -e "$NEW_DIR/test.txt" ]; then
-  echo "File '$NEW_DIR/test.txt' exists already"
+if [ -e "$NEW_DIR/test_one.txt" ]; then
+  echo "File '$NEW_DIR/test_one.txt' exists already"
 else
-  touch "$NEW_DIR/test.txt"
-  echo "File '$NEW_DIR/test.txt' created"
+  touch "$NEW_DIR/test_one.txt"
+  echo "File '$NEW_DIR/test_one.txt' created"
+fi
+
+# Test file
+if [ -e "$NEW_DIR/test_two.txt" ]; then
+  echo "File '$NEW_DIR/test_two.txt' exists already"
+else
+  touch "$NEW_DIR/test_two.txt"
+  echo "File '$NEW_DIR/test_two.txt' created"
 fi
 
 # Done
