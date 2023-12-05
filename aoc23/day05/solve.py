@@ -2,6 +2,7 @@ import sys
 from aocsolution.basesolution import BaseSolution
 
 import re
+import numpy as np
 
 @BaseSolution.time_this
 def solve_one(self):
@@ -28,6 +29,36 @@ def solve_one(self):
         locations[seed] = dest
 
     return min(locations.values())
+
+def solve_two_np(self):
+    result = 0
+    input = self.get_data(split=False)
+    inputs = input.split('\n\n')
+    seeds = [int(i) for i in inputs[0].split(': ')[1].split(' ')]
+    maps = [i.split('\n')[1:] for i in inputs[1:]]
+
+    nb_seeds = sum(seeds[1::2]) - len(seeds[1::2])
+
+    def mapping(source, map):
+        for m in map:
+            d, s, r = m.split(' ')
+            if source >= int(s) and source < (int(s) + int(r)):
+                return source - int(s) + int(d)
+        return source
+
+    locations = np.empty((nb_seeds))
+    sums = 0
+    for i in range(0, len(seeds), 2):
+        for j in range(seeds[i+1]):
+            # print("\nseed", seed, end=' ')
+            dest = seeds[i]+j
+            for map in maps:
+                dest = mapping(dest, map)
+                # print(dest, end=' ')
+            locations[sums+j] = dest
+        sums += seeds[i+1]-1-1
+
+    return min(locations)
 
 
 @BaseSolution.time_this
@@ -79,10 +110,8 @@ def solve_two(self):
         return new
 
     dest = ranges
-    print(dest)
     for map in maps:
         dest = mapping(dest, map)
-        # print(dest)
     result = min(d[0] for d in dest)
 
     return result
@@ -90,6 +119,7 @@ def solve_two(self):
 class Solution(BaseSolution):
     solve_one = solve_one
     solve_two = solve_two
+    solve_two_np = solve_two_np
 
 
 if __name__ == "__main__":
@@ -97,4 +127,4 @@ if __name__ == "__main__":
     timing = len(sys.argv) > 1 and 'time' in sys.argv[1]
     solution = Solution(test=test)
     print("The result for part 1 is:", solution.solve_one())
-    print("The result for part 2 is:", solution.solve_two())
+    print("The result for part 2 is:", solution.solve_two_np())
