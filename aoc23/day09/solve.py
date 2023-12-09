@@ -5,43 +5,26 @@ import re
 
 @BaseSolution.time_this
 def solve_one(self):
-    result = 0
-    input = self.get_data()
-
-    for history in input:
-        diff_levels = []
-        diff = [int(h) for h in history.split()]
-
-        while set(diff) != {0,}:
-            diff_levels.append(diff)
-            diff = [diff[i+1] - diff[i] for i in range(len(diff)-1)]
-
-        for i in range(len(diff_levels)-1,0,-1):
-            diff_levels[i-1].append(diff_levels[i-1][-1]+diff_levels[i][-1])
-
-        result += diff_levels[0][-1]
-
-    return result
+    return self.solve_two()[0]
 
 
 @BaseSolution.time_this
 def solve_two(self):
-    result = 0
     input = self.get_data()
-
+    first = []
+    last = []
     for history in input:
         diff_levels = []
         diff = [int(h) for h in history.split()]
         while set(diff) != {0,}:
             diff_levels.append(diff)
             diff = [diff[i+1] - diff[i] for i in range(len(diff)-1)]
-
         for i in range(len(diff_levels)-1,0,-1):
+            diff_levels[i-1].append(diff_levels[i-1][-1]+diff_levels[i][-1])
             diff_levels[i-1].insert(0, diff_levels[i-1][0]-diff_levels[i][0])
-
-        result += diff_levels[0][0]
-
-    return result
+        last.append(diff_levels[0][-1])
+        first.append(diff_levels[0][0])
+    return sum(last), sum(first)
 
 
 class Solution(BaseSolution):
