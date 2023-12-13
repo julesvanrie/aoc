@@ -7,23 +7,22 @@ from copy import deepcopy
 def find_mirror(pattern):
     result = []
     for i in range(1,len(pattern)):
-        candidate = True
-        max_mirror = min(i, (len(pattern)-i))
-        for j in range(max_mirror):
+        lines_to_check = min(i, len(pattern)-i)
+        j = 0
+        while j < lines_to_check:
             if pattern[i-j-1] != pattern[i+j]:
-                candidate = False
                 break
-        if candidate:
+            j += 1
+        if j == lines_to_check:
             result += [i]
-    if not result:
-        return [0]
-    return result
+    return result if result else [0]
 
 
 def transpose(pattern):
     h = len(pattern)
     w = len(pattern[0])
-    return [''.join([pattern[y][x] for y in range(h)]) for x in range(w)]
+    return [''.join([pattern[y][x] for y in range(h)])
+            for x in range(w)]
 
 
 @BaseSolution.time_this
@@ -33,7 +32,6 @@ def solve_one(self):
 
     for pattern in input[:]:
         pattern = pattern.split()
-
         result += 100 * find_mirror(pattern)[0]
         result += find_mirror(transpose(pattern))[0]
 
@@ -47,7 +45,7 @@ def solve_two(self):
 
     for pattern in input[:]:
         pattern = [[c for c in r] for r in pattern.split()]
-        intermed = 0
+        temp = 0
         for y in range(len(pattern)):
             for x in range(len(pattern[0])):
                 new = deepcopy(pattern)
@@ -58,21 +56,14 @@ def solve_two(self):
                 h_pattern = find_mirror(pattern)[0]
                 v_new = find_mirror(transpose(new))
                 v_pattern = find_mirror(transpose(pattern))[0]
-                if h_new[0]:
-                    if len(h_new) == 1 and h_new[0] != h_pattern:
-                        intermed += 100 * h_new[0]
-                    else:
-                        intermed += 100 * (sum(h_new) - h_pattern)
-                if v_new[0]:
-                    if len(v_new) == 1 and v_new[0] != v_pattern:
-                        intermed += v_new[0]
-                    else:
-                        intermed += sum(v_new) - v_pattern
-                if intermed:
+
+                temp += 100 * (sum(h_new) - h_pattern * (h_pattern in h_new))
+                temp += sum(v_new) - v_pattern * (v_pattern in v_new)
+                if temp:
                     break
-            if intermed:
+            if temp:
                 break
-        result += intermed
+        result += temp
 
     return result
 
