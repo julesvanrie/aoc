@@ -6,10 +6,10 @@ from pprint import pprint
 
 # Valid connections for a given direction (y, x)
 c = {
-    (0, -1): ['-', 'F', 'L'],
-    (0, +1): ['-', '7', 'J'],
-    (-1, 0): ['|', 'F', '7'],
-    (+1, 0): ['|', 'L', 'J'],
+    (0, -1): ['-', 'F', 'L'], # left
+    (0, +1): ['-', '7', 'J'], # right
+    (-1, 0): ['|', 'F', '7'], # up
+    (+1, 0): ['|', 'L', 'J'], # down
 }
 
 def find_loop(self, p):
