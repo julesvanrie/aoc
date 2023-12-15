@@ -90,7 +90,6 @@ def solve_two(self):
         iter += 1
 
     iter -= 1
-    print(iter, end='\n')
     viz = deepcopy(new_pos)
     for m in range(iter % 4):
         viz = counter_clock_wise(viz)
