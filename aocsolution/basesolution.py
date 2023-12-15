@@ -129,6 +129,6 @@ class BaseSolution():
             start = time.time()
             result = func(*args, **kwargs)
             end = time.time()
-            print(f"This took {(end-start) // 60} minutes, {round((end - start) % 60, 6)} seconds")
+            print(f"This took {(end-start) // 60} minutes, {(end - start) % 60:.6f} seconds")
             return result
         return wrapper
