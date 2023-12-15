@@ -18,18 +18,19 @@ def solve_one(self):
 
     return result
 
+
+def hash(step):
+    temp = 0
+    for c in step:
+        temp += ord(c)
+        temp *= 17
+        temp %= 256
+    return temp
+
+
 @BaseSolution.time_this
 def solve_one_comp(self):
     input = self.get_data()[0].strip().split(',')
-
-    def hash(step):
-        temp = 0
-        for c in step:
-            temp += ord(c)
-            temp *= 17
-            temp %= 256
-        return temp
-
     return sum(hash(step) for step in input)
 
 
@@ -55,32 +56,26 @@ def solve_one_func(self):
 
 @BaseSolution.time_this
 def solve_two(self):
-    result = 0
     input = self.get_data()[0].strip().split(',')
 
     boxes = [{} for i in range(256)]
 
     for step in input:
         label = step.split('=')[0].split('-')[0]
-        nb = 0
-        for c in label:
-            nb += ord(c)
-            nb *= 17
-            nb %= 256
-        box = boxes[nb]
+        box = boxes[hash(label)]
         if step[-1] == '-':
-            try:
+            if label in box:
                 del box[label]
-            except:
-                pass
         else:
-            box[label] =  int(step.split('=')[1])
+            box[label] = int(step.split('=')[1])
 
-    for idx, box in enumerate(boxes, 1):
-        for slot, focal in enumerate(box.values(), 1):
-            result += idx * slot * focal
-
-    return result
+    return sum(
+        sum(
+            idx * slot * focal
+            for slot, focal in enumerate(box.values(), 1)
+        )
+        for idx, box in enumerate(boxes, 1)
+    )
 
 
 class Solution(BaseSolution):
