@@ -2,18 +2,29 @@ import sys
 from aocsolution.basesolution import BaseSolution
 
 import re
+from copy import deepcopy
+from pprint import pprint
+
 
 @BaseSolution.time_this
 def solve_one(self):
-    result = 0
     input = self.get_data()
+    h = len(input)
+    w = len(input[0])
+
+    result = 0
+
     return result
 
 
 @BaseSolution.time_this
 def solve_two(self):
-    result = 0
     input = self.get_data()
+    h = len(input)
+    w = len(input[0])
+
+    result = 0
+
     return result
 
 
