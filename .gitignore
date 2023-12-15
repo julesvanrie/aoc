@@ -4,3 +4,7 @@
 **/.vscode
 .env
 **/*.egg-info/
+
+input.txt
+test*.txt
+tries*
