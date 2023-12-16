@@ -13,35 +13,22 @@ vizs = {
 }
 
 dirs = {
-    0: (0,+1),
-    1: (+1,0),
-    2: (0,-1),
-    3: (-1,0),
+    0: (0,+1), # East
+    1: (+1,0), # South
+    2: (0,-1), # West
+    3: (-1,0), # South
 }
 
-def deviate(direction, tile):
-    if tile == '.':
-        return [direction]
-    if tile == '-':
-        if direction in [0,2]:
-            return [direction]
-        else:
-            return [0,2]
-    if tile == '|':
-        if direction in [1,3]:
-            return [direction]
-        else:
-            return [1,3]
+def deviate(d, tile):
+    if tile == '-' and d in [1,3]:
+        return [0,2]
+    if tile == '|' and d in [0,2]:
+        return [1,3]
     if tile == '\\':
-        if direction in [0,2]:
-            return [(direction + 1) % 4]
-        else:
-            return [(direction - 1) % 4]
+        return [(d - 1) % 4] if d % 2 else [(d + 1) % 4]
     if tile == '/':
-        if direction in [0,2]:
-            return [(direction - 1) % 4]
-        else:
-            return [(direction + 1) % 4]
+        return [(d + 1) % 4] if d % 2 else [(d - 1) % 4]
+    return [d]
 
 
 @BaseSolution.time_this
@@ -54,21 +41,24 @@ def energize(self, input, initial):
     h = len(input)
     w = len(input[0])
 
+    # Create a states array with a binary representation of directions
     states = [[0 for x in range(w)] for y in range(h)]
-
     # viz = [[input[y][x] for x in range(w)] for y in range(h)]
 
     next_up = [initial]
     while next_up:
         y, x, d = next_up.pop()
+        # Bitwise adding direction to the state
         states[y][x] |= 2**d
         new = deviate(d, input[y][x])
         for dn in new:
             yn = y + dirs[dn][0]
             xn = x + dirs[dn][1]
-            if yn >= h or yn < 0 or xn >= w or xn < 0:
-                continue
-            if not states[yn][xn] & 2**dn:
+            if not (
+                yn >= h or yn < 0           # Vertical out of bounds
+                or xn >= w or xn < 0        # Horizontal out of bounds
+                or states[yn][xn] & 2**dn   # Already been here
+            ):
                 next_up.append((yn,xn,dn))
             # if viz[yn][xn] == '.':
             #     viz[yn][xn] = vizs[dn]
@@ -77,9 +67,7 @@ def energize(self, input, initial):
     # for row in viz:
     #     print(''.join(t for t in row))
 
-    result = sum(sum(1 for x in range(w) if states[y][x]) for y in range(h))
-
-    return result
+    return sum(sum(1 for x in range(w) if states[y][x]) for y in range(h))
 
 
 @BaseSolution.time_this
