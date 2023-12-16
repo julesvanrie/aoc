@@ -31,12 +31,6 @@ def deviate(d, tile):
     return [d]
 
 
-@BaseSolution.time_this
-def solve_one(self):
-    input = self.get_data()
-    initial = (0,0,0)
-    return self.energize(input, initial)
-
 def energize(self, input, initial):
     h = len(input)
     w = len(input[0])
@@ -68,6 +62,13 @@ def energize(self, input, initial):
     #     print(''.join(t for t in row))
 
     return sum(sum(1 for x in range(w) if states[y][x]) for y in range(h))
+
+
+@BaseSolution.time_this
+def solve_one(self):
+    input = self.get_data()
+    initial = (0,0,0)
+    return self.energize(input, initial)
 
 
 @BaseSolution.time_this
