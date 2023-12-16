@@ -5,69 +5,79 @@ import re
 from copy import deepcopy
 from pprint import pprint
 
-viz = {
-    (0,+1): '>',
-    (0,-1): '<',
-    (+1,0): 'v',
-    (-1,0): '^',
+vizs = {
+    0: '>',
+    1: 'v',
+    2: '<',
+    3: '^',
+}
+
+dirs = {
+    0: (0,+1),
+    1: (+1,0),
+    2: (0,-1),
+    3: (-1,0),
 }
 
 def deviate(direction, tile):
     if tile == '.':
         return [direction]
     if tile == '-':
-        if direction[1]:
+        if direction in [0,2]:
             return [direction]
         else:
-            return [(0,+1),(0,-1)]
+            return [0,2]
     if tile == '|':
-        if direction[0]:
+        if direction in [1,3]:
             return [direction]
         else:
-            return [(+1,0),(-1,0)]
+            return [1,3]
     if tile == '\\':
-        return [(direction[1], direction[0])]
+        if direction in [0,2]:
+            return [(direction + 1) % 4]
+        else:
+            return [(direction - 1) % 4]
     if tile == '/':
-        return [(-direction[1], -direction[0])]
+        if direction in [0,2]:
+            return [(direction - 1) % 4]
+        else:
+            return [(direction + 1) % 4]
 
 
 @BaseSolution.time_this
 def solve_one(self):
     input = self.get_data()
-    initial = ((0,0),(0,+1))
+    initial = (0,0,0)
     return self.energize(input, initial)
 
 def energize(self, input, initial):
     h = len(input)
     w = len(input[0])
 
-    states = [initial]
+    states = [[0 for x in range(w)] for y in range(h)]
 
-    tiles = [[input[y][x] for x in range(w)] for y in range(h)]
+    # viz = [[input[y][x] for x in range(w)] for y in range(h)]
 
-
-    for state in states:
-        # breakpoint()
-        y = state[0][0]
-        x = state[0][1]
-        tile = input[y][x]
-        new = deviate(state[1], tile)
-        for n in new:
-            yn = y + n[0]
-            xn = x + n[1]
+    next_up = [initial]
+    while next_up:
+        y, x, d = next_up.pop()
+        states[y][x] |= 2**d
+        new = deviate(d, input[y][x])
+        for dn in new:
+            yn = y + dirs[dn][0]
+            xn = x + dirs[dn][1]
             if yn >= h or yn < 0 or xn >= w or xn < 0:
                 continue
-            new_state = ((yn,xn), n)
-            if tiles[yn][xn] == '.':
-                tiles[yn][xn] = viz[n]
+            if not states[yn][xn] & 2**dn:
+                next_up.append((yn,xn,dn))
+            # if viz[yn][xn] == '.':
+            #     viz[yn][xn] = vizs[dn]
             # print(state, tile, new_state)
-            if new_state not in states:
-                states.append(new_state)
 
-    # for row in tiles:
+    # for row in viz:
     #     print(''.join(t for t in row))
 
-    result = len(set(state[0] for state in states))
+    result = sum(sum(1 for x in range(w) if states[y][x]) for y in range(h))
 
     return result
 
@@ -78,27 +88,18 @@ def solve_two(self):
     h = len(input)
     w = len(input[0])
 
-    potential = []
+    result = 0
 
     for y in range(h):
-        for x in range(w):
-            dirs = []
-            if y == 0:
-                dirs.append((+1,0))
-            if y == h-1:
-                dirs.append((-1,0))
-            if x == 0:
-                dirs.append((0,+1))
-            if x == w-1:
-                dirs.append((0,-1))
-
-            for d in dirs:
-                initial = ((y,x),d)
-                print(initial)
-                potential.append(energize(self, input, initial))
-
-
-    result = max(potential)
+        result = max(result,
+                     energize(self, input, (y,0,0)),
+                     energize(self, input, (y,w-1,2))
+                     )
+    for x in range(w):
+        result = max(result,
+                     energize(self, input, (0,x,1)),
+                     energize(self, input, (h-1,x,3))
+                     )
 
     return result
 
