@@ -4,6 +4,7 @@ from aocsolution.basesolution import BaseSolution
 import re
 from copy import deepcopy
 from pprint import pprint
+from heapq import *
 
 
 dirs = {
@@ -14,29 +15,29 @@ dirs = {
 }
 
 
-def find_next(distances, visited):
-    min = 2**63
-    miny = None
-    minx = None
-    mind = None
-    minc = None
-    for y in range(1, len(distances)-1):
-        for x in range(1,len(distances[y])-1):
-            for d in dirs.keys():
-                for c in [3, 2, 1, 0]:
-                    # penalized_distance = distances[y][x][d][c] #+ prev_dir_counts[y][x][d]
-                    if (not visited[y][x][d][c]
-                        and min > distances[y][x][d][c]):# + prev_dir_counts[y][x][d]):
-                        min = distances[y][x][d][c]
-                        miny = y
-                        minx = x
-                        mind = d
-                        minc = c
-    return miny, minx, mind, minc
+# def find_next(distances, visited):
+#     min = 2**63
+#     miny = None
+#     minx = None
+#     mind = None
+#     minc = None
+#     for y in range(1, len(distances)-1):
+#         for x in range(1,len(distances[y])-1):
+#             for d in dirs.keys():
+#                 for c in [0, 1, 2, 3]: #[3, 2, 1, 0]:
+#                     # penalized_distance = distances[y][x][d][c] #+ prev_dir_counts[y][x][d]
+#                     if (not visited[y][x][d][c]
+#                         and min > distances[y][x][d][c]):# + prev_dir_counts[y][x][d]):
+#                         min = distances[y][x][d][c]
+#                         miny = y
+#                         minx = x
+#                         mind = d
+#                         minc = c
+#     return miny, minx, mind, minc
 
 
-def not_finished(visited):
-    return sum(sum(sum(d.values()) for d in vis) for vis in visited)
+# def not_finished(visited):
+#     return sum(sum(sum(d.values()) for d in vis) for vis in visited)
 
 
 @BaseSolution.time_this
@@ -46,6 +47,7 @@ def solve_one(self):
     w = len(input[0])
 
     maxd = 2**63 #(w+h)*10
+    # maxd = h*10+w*10
 
     weights = [[maxd for i in range(w+2)]] \
             + [[maxd] + [int(c) for c in r] + [maxd] for r in input] \
@@ -61,23 +63,36 @@ def solve_one(self):
         visited[y][w+1] =  {d: [True, True, True, True] for d in dirs.keys()}
 
     distances = [[{d: [maxd, maxd, maxd, maxd] for d in dirs.keys()} for c in r] for r in weights]
-    prev_dir = [[{d: (0,0) for d in dirs.keys()} for c in r] for r in weights]
-    prev_dir_counts = [[{d: [0, 0, 0, 0] for d in dirs.keys()} for c in r] for r in weights]
+    # prev_dir = [[{d: (0,0) for d in dirs.keys()} for c in r] for r in weights]
+    # prev_dir_counts = [[{d: [0, 0, 0, 0] for d in dirs.keys()} for c in r] for r in weights]
     parents = [[{d: [None, None, None, None] for d in dirs.keys()} for c in r] for r in weights]
 
     for d in dirs.keys():
-        distances[1][1][d] = [0, 0, 0, 0]
+        distances[1][1][d] = [0, 2**63, 2**63, 2**63]
+
+    nexts = [(0, (1, 1, d, 0)) for d in [(0,+1),(+1,0)]]
+
+    heapify(nexts)
 
     i = 0
     # while i < 5:
-    while True:
+    while nexts:
         # not_finished(visited): # and i < 30:
-        y, x, d, c = find_next(distances, visited)
+        dist, (y, x, d, c) = heappop(nexts)
+        if visited[y][x][d][c]:
+            continue
+
+        # if y == h and x == w:
+        #     break
         # print(y,x,d,c)
         if y is None:
             break
 
         visited[y][x][d][c] = True
+
+        # if distances[y][x][d][c] + (h-y) + (w-y) > maxd:
+        #     continue
+
 
         for nd in dirs.keys():
             # Old dirs and check not reversign
@@ -99,24 +114,26 @@ def solve_one(self):
             # reverse_dir = (dx and dx == -ox
             #                or dy and dy == -oy)
             # print(change_dir, dy, dx, prev_dir[y][x])
-            if same_dir and c == 3:
-                    continue
+            if same_dir and c == 2:
+                continue
             nc = c + 1 if same_dir else 0
             # else:
             #     print(d, nd)
             # print(ny, nx)
             old = distances[ny][nx][nd][c]
-            new = distances[y][x][d][c] + weights[ny][nx]
+            # new = distances[y][x][d][c] + weights[ny][nx]
+            new = dist + weights[ny][nx]
             if new < old:
                 distances[ny][nx][nd][nc] = new
                 parents[ny][nx][nd][nc] = (y, x, d, c)
+                heappush(nexts, (new, (ny, nx, nd, nc)))
                 # prev_dir[ny][nx][nd] = d
                 # prev_dir_counts[ny][nx][nd] = c + 1 if same_dir else 0
                 # print((h*w), sum(sum(sum(d.values()) for d in vis) for vis in visited)-h-h-w-w+4)
 
-        if not i % 1000:
-            print(i, y, x, d, c)
-        i += 1
+        # if not i % 1000:
+        #     print(i, y, x, d, c) #, sum(sum(sum(d.values()) for d in vis) for vis in visited)-h-h-w-w+4)
+        # i += 1
 
     # for r in weights:
     #     print(' '.join(f"{c:3}" for c in r))
@@ -133,20 +150,25 @@ def solve_one(self):
 
     # pprint(distances[1:-1])
 
+    pprint(distances[h-1][w])
+    print()
+    pprint(distances[h][w-1])
+    print()
     print(distances[h][w][(0, 1)])
     print(distances[h][w][(1, 0)])
 
-    end = 2*63
+    end = 2**63
     end_d = None
     end_c = None
-    for d in dirs.keys():
-        for c in [0, 1, 2]:
+    for d in [(0,+1),(+1,0)]:
+        for c in [0, 1, 2, 3]:
             if distances[h][w][d][c] < end:
                 end = distances[h][w][d][c]
                 end_d = d
                 end_c = c
 
     pos = (h, w, end_d, end_c)
+    print(pos)
     while (pos[0], pos[1]) != (1, 1):
         # print(pos)
         y = pos[0]
