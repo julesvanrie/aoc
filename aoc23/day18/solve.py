@@ -15,7 +15,7 @@ dirs = {
 }
 
 @BaseSolution.time_this
-def solve_one(self):
+def solve_one_old(self):
     input = self.get_data()
     h = len(input)
     w = len(input[0])
@@ -78,121 +78,42 @@ def solve_one(self):
     return result
 
 
+def shoelace(digging):
+    y, x = (0, 0)
+    points = []
+    for (dy, dx), l in digging:
+        (y, x) = (y + dy*l, x + dx*l)
+        points.append((y,x))
+
+    shoelace = sum(points[i][1] * points[i+1][0]
+                 - points[i][0] * points[i+1][1]
+                   for i in range(0, len(points)-1))
+
+    picks_perimeter = sum(l for _, l in digging) / 2 + 1
+
+    return int(abs(shoelace) / 2 + picks_perimeter)
+
+
 @BaseSolution.time_this
-def solve_twos(self):
+def solve_one(self):
     input = self.get_data()
-    h = len(input)
-    w = len(input[0])
 
     digging = [r.split(' ') for r in input]
     digging = [(dirs[r[0]], int(r[1])) for r in digging]
 
-    points = {}
+    return shoelace(digging)
 
-    y, x = (0, 0)
-    for (dy, dx), l in digging:
-        if y not in points.keys():
-            points[y] =  [x] #{x: (dy, dx, l)}
-        else:
-            points[y].append(x) #[x] = (dy, dx, l)
-        y, x = (y + l*dy, x + l*dx)
-
-    result = 0
-    yprev = min(points.keys())
-    ys = sorted(points.keys())
-    for i, y in enumerate(ys[:-1]):
-        print(result, y)
-        x = sorted(points[y])
-        ny = ys[i+1]
-        if len(x) == 2:
-            if i == 0:
-                result += (ys[i+1] - y) * (x[1] - x[0] + 1)
-                prevx = x
-            else:
-                py = ys[i-1]
-                if x[0] == prevx[0]:
-                    result += (ny - y) * (prevx[1] - x[1] + 1)
-                    prevx = x
-                elif x[1] ==  prevx[1]:
-                    result += (ny - y) * (prevx[0] - x[0] + 1)
-                    prevx = x
-                result += x[1] - x[0]
-        elif len(x) == 4:
-            print("We got 4", x, prevx)
-            if (x[0] == prevx[0]):
-                print("here")
-                result += (ny - y) * (x[3] - x[1] + 1)
-                result += x[1] - x[0]
-                prevx = x
-            elif (x[0] <= prevx[0]):
-                result += (ny - y) * (x[2] - x[0] + 1)
-                result += x[3] - x[2]
-                prevx = x
-            else:
-                print("que", x)
-
-        else:
-            print("strange", x)
-        # result += (y-yprev) * points[y]
-    lastx = sorted(points[ys[-1]])
-    result += lastx[1] - lastx[0] + 1
-
-        # yprev = y
-
-
-    # ymax = max(p[0] for p in points)
-    # ymin = min(p[0] for p in points)
-    # xmax = max(p[1] for p in points)
-    # xmin = min(p[1] for p in points)
-
-    return result
 
 @BaseSolution.time_this
 def solve_two(self):
     input = self.get_data()
 
-    digging = [r.split(' ') for r in input]
-    digging = [(dirs[r[0]], int(r[1])) for r in digging]
+    ds = list(dirs.values())
 
-
-    # Find the points for part 1
-    y, x = (0, 0)
-    points = []
-    for (dy, dx), l in digging:
-        y = y + dy*l
-        x = x + dx*l
-        points.append((y,x))
-
-    # Find the points for part 2
-    ds = [
-        (0, -1),
-        (+1, 0),
-        (0, +1),
-        (-1, 0),
-    ]
     digging = [r.split(' ')[-1].strip('()#') for r in input]
     digging = [(ds[int(r[-1])], int(r[:-1],16)) for r in digging]
 
-    y, x = (0, 0)
-    points = []
-    for (dy, dx), l in digging:
-        y = y + dy*l
-        x = x + dx*l
-        points.append((y,x))
-
-
-    # Shoelace
-    result = 0
-    for i in range(0, len(points)-1):
-        result += (points[i][1] * points[i+1][0]
-                     - points[i][0] * points[i+1][1])
-        print(i, result)
-
-    # Pick's theorem
-    perimeter = sum(l for _, l in digging) / 2 + 1
-
-    return abs(result) / 2 + perimeter
-
+    return shoelace(digging)
 
 class Solution(BaseSolution):
     solve_one = solve_one
