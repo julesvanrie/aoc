@@ -15,7 +15,7 @@ dirs = [
 ]
 
 @BaseSolution.time_this
-def solve_one(self):
+def solve_ones(self):
     input = self.get_data()
     h = len(input)
     w = len(input[0])
@@ -59,6 +59,51 @@ def solve_one(self):
 
 
     # pprint([''.join(f) for f in field])
+
+    return result
+
+def solve_one(self):
+    input = self.get_data()
+    h = len(input)
+    w = len(input[0])
+
+    # Number of steps (real or test)
+    nb = 64 if h > 100 else 6
+
+    # Adding some # around as padding
+    # (removes the need to check boundaries)
+    field = ['#'*w] + input + ['#'*w]
+    field = ['#' + f + '#' for f in field]
+    field = [list(f) for f in field]
+
+    # Find the start
+    start = ()
+    for y, r in enumerate(field):
+        for x, c in enumerate(r):
+            if c == 'S':
+                start = (y, x, 0)
+                field[y][x] = 0
+
+    result = 1
+
+    # Saving next spots to explore
+    nexts = deque([start])
+    while nexts:
+        y, x, c = nexts.popleft()
+        for dy, dx in dirs:
+            ny = y + dy
+            nx = x + dx
+            if field[ny][nx] not in ['#']:
+                if field[ny][nx] == '.':
+                    field[ny][nx] = c+1
+                    if c % 2:
+                        result += 1
+                elif field[ny][x] > c+1:
+                    field[ny][nx] = c+1
+                else:
+                    continue
+                if c + 1 < nb:
+                    nexts.append((ny, nx, c+1))
 
     return result
 
