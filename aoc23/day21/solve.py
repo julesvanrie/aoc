@@ -93,17 +93,23 @@ def solve_one(self):
         for dy, dx in dirs:
             ny = y + dy
             nx = x + dx
-            if field[ny][nx] not in ['#']:
-                if field[ny][nx] == '.':
-                    field[ny][nx] = c+1
-                    if c % 2:
-                        result += 1
-                elif field[ny][x] > c+1:
-                    field[ny][nx] = c+1
-                else:
-                    continue
-                if c + 1 < nb:
-                    nexts.append((ny, nx, c+1))
+            # If we hit a rock
+            if field[ny][nx] == '#':
+                continue
+            # If we haven't been here
+            if field[ny][nx] == '.':
+                field[ny][nx] = c+1
+                if c % 2:
+                    result += 1
+            # If we have been here before,
+            # but needed more steps
+            elif field[ny][nx] > c+1:
+                field[ny][nx] = c+1
+            else:
+                continue
+            # If we didn't run out of steps
+            if c + 1 < nb:
+                nexts.append((ny, nx, c+1))
 
     return result
 
