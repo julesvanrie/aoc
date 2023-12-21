@@ -62,6 +62,7 @@ def solve_ones(self):
 
     return result
 
+@BaseSolution.time_this
 def solve_one(self):
     input = self.get_data()
     h = len(input)
@@ -84,6 +85,8 @@ def solve_one(self):
                 start = (y, x, 0)
                 field[y][x] = 0
 
+    visited = {(start[0], start[1]): 0}
+
     result = 1
 
     # Saving next spots to explore
@@ -97,14 +100,14 @@ def solve_one(self):
             if field[ny][nx] == '#':
                 continue
             # If we haven't been here
-            if field[ny][nx] == '.':
-                field[ny][nx] = c+1
+            if (ny,nx) not in visited:
+                visited[(ny,nx)] = c+1
                 if c % 2:
                     result += 1
             # If we have been here before,
             # but needed more steps
-            elif field[ny][nx] > c+1:
-                field[ny][nx] = c+1
+            elif visited[(ny,nx)] > c+1:
+                visited[(ny,nx)] = c+1
             else:
                 continue
             # If we didn't run out of steps
