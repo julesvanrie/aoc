@@ -5,6 +5,7 @@ import re
 from copy import deepcopy
 from pprint import pprint
 from collections import deque
+from numpy.polynomial.polynomial import polyfit, polyval
 
 
 dirs = [
@@ -15,67 +16,14 @@ dirs = [
 ]
 
 @BaseSolution.time_this
-def solve_ones(self):
+def solve_one(self, nb=64):
     input = self.get_data()
     h = len(input)
     w = len(input[0])
 
-    nb = 64 if h > 100 else 6
+    field = [list(f) for f in input]
 
-    field = ['#'*w] + input + ['#'*w]
-    field = ['#' + f + '#' for f in field]
-    field = [list(f) for f in field]
-
-    # pprint(field)
-
-    start = ()
-    for y, r in enumerate(field):
-        for x, c in enumerate(r):
-            if c == 'S':
-                start = (y,x)
-
-    states = deque([(start[0], start[1], 0)])
-
-    result = 0
-
-    visited = []
-
-    # for y, x, c in states:
-    while states:
-        y, x, c = states.popleft()
-        visited.append((y, x, c))
-        for dy, dx in dirs:
-            ny = y + dy
-            nx = x + dx
-            if (ny, nx, c+1) not in visited and field[ny][nx] != '#':
-                if c+1 == nb:# and field[ny][nx] != 'O':
-                    result += 1
-                    print(result, end='\r')
-                    field[ny][nx] = 'O'
-                    visited.append((ny, nx, c+1))
-                else:
-                    states.appendleft((ny, nx, c+1))
-
-
-
-    # pprint([''.join(f) for f in field])
-
-    return result
-
-@BaseSolution.time_this
-def solve_one(self):
-    input = self.get_data()
-    h = len(input)
-    w = len(input[0])
-
-    # Number of steps (real or test)
-    nb = 64 if h > 100 else 6
-
-    # Adding some # around as padding
-    # (removes the need to check boundaries)
-    field = ['#'*w] + input + ['#'*w]
-    field = ['#' + f + '#' for f in field]
-    field = [list(f) for f in field]
+    even = 1 if (nb % 2) == 0 else 0
 
     # Find the start
     start = ()
@@ -87,7 +35,7 @@ def solve_one(self):
 
     visited = {(start[0], start[1]): 0}
 
-    result = 1
+    result = even
 
     # Saving next spots to explore
     nexts = deque([start])
@@ -97,12 +45,12 @@ def solve_one(self):
             ny = y + dy
             nx = x + dx
             # If we hit a rock
-            if field[ny][nx] == '#':
+            if field[ny % h][nx % w] == '#':
                 continue
             # If we haven't been here
             if (ny,nx) not in visited:
-                visited[(ny,nx)] = c+1
-                if c % 2:
+                visited[(ny,nx)] = c + 1
+                if c % 2 == even:
                     result += 1
             # If we have been here before,
             # but needed more steps
@@ -121,11 +69,12 @@ def solve_one(self):
 def solve_two(self):
     input = self.get_data()
     h = len(input)
-    w = len(input[0])
-
-    result = 0
-
-    return result
+    x = [0, 1, 2]
+    nb = list(map(lambda x: int(h/2) + h * x, x))
+    y = list(map(self.solve_one, nb))
+    coefs = polyfit(x, y, deg=2)
+    nb_fields = (26501365 - int(h/2)) / h
+    return int(polyval(nb_fields, coefs))
 
 
 class Solution(BaseSolution):
