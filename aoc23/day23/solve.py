@@ -147,8 +147,7 @@ def solve_two(self):
     h = len(input)
     w = len(input[0])
 
-    field = [['#' if c == '#' else '.' for c in r] for r in input]
-    field = deepcopy(input)
+    field = input
     nexts = next_crossings(field)
 
     start = (0, 1)
