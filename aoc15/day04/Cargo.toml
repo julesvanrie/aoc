@@ -1,0 +1,5 @@
+[package]
+name = "solve"
+
+[dependencies]
+md5 = "0"
