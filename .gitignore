@@ -1,6 +1,7 @@
 **/__pycache__
 .python-version
 **/*.out
+**/solve
 **/.vscode
 .env
 **/*.egg-info/
