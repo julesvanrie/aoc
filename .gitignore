@@ -2,6 +2,7 @@
 .python-version
 **/*.out
 **/solve
+**/target
 **/.vscode
 .env
 **/*.egg-info/
