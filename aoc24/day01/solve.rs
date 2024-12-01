@@ -21,18 +21,14 @@ fn solve(input: &mut io::Lines<io::BufReader<File>>) {
     let mut answer_one = 0;
     let mut answer_two = 0;
 
-    let mut lefties = vec![];
-    let mut righties = vec![];
-
-    input
-        .map(|line| line.unwrap().split("   ")
-                        .map(|item| i32::from_str(item).unwrap())
-                        .collect()
-        )
-        .for_each(|couple: Vec<i32>| {
-            lefties.push(couple[0]);
-            righties.push(couple[1]);
-        });
+    let (mut lefties, mut righties): (Vec<i32>, Vec<i32>)
+        = input.map(|line| {
+            let binding = line.unwrap();
+            let (left, right) = binding.split_once("   ").unwrap();
+            (i32::from_str(left).unwrap(),
+             i32::from_str(right).unwrap())
+        })
+        .unzip();
 
     lefties.sort();
     righties.sort();
