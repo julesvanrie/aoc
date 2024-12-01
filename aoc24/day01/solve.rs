@@ -1,50 +1,34 @@
 use std::env;
-use std::fs;
+use std::io::{self, BufRead};
+use std::fs::File;
 use std::error::Error;
 use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let input = read_input();
-
-    solve(&input);
-
+    let mut input = read_input()?;
+    solve(&mut input);
     Ok(())
 }
 
-fn read_input() -> Vec<String> {
+fn read_input() -> io::Result<io::Lines<io::BufReader<File>>> {
     let args: Vec<String> = env::args().collect();
     let file_name = format!("{}.txt", &args[1]);
-    fs::read_to_string(file_name)
-        .unwrap()
-        .lines()
-        .map(String::from)
-        .collect()
+    let file = File::open(file_name)?;
+    Ok(io::BufReader::new(file).lines())
 }
 
-fn solve(input: &Vec<String>) {
+fn solve(input: &mut io::Lines<io::BufReader<File>>) {
     let mut answer_one = 0;
     let mut answer_two = 0;
 
     let mut lefties = vec![];
     let mut righties = vec![];
 
-    // for line in input {
-    //     let splitted: Vec<i32> = line.split("   ")
-    //         .map(|num| i32::from_str(num).unwrap())
-    //         .collect();
-    //     lefties.push(splitted[0]);
-    //     righties.push(splitted[1]);
-    // }
-    // input.iter()
-    //     .map(|line| line.split("   "))
-    //     .for_each(|mut couple| {
-    //         lefties.push(i32::from_str(couple.next().unwrap()).unwrap());
-    //         righties.push(i32::from_str(couple.next().unwrap()).unwrap());
-    //     });
-    input.iter()
-        .map(|line| line.split("   ")
-                         .map(|item| i32::from_str(item).unwrap())
-                         .collect())
+    input
+        .map(|line| line.unwrap().split("   ")
+                        .map(|item| i32::from_str(item).unwrap())
+                        .collect()
+        )
         .for_each(|couple: Vec<i32>| {
             lefties.push(couple[0]);
             righties.push(couple[1]);
