@@ -1,0 +1,5 @@
+[package]
+name = "solve"
+
+[dependencies]
+regex = "1"
