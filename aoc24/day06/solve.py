@@ -1,9 +1,6 @@
 import sys
 from aocsolution.basesolution import BaseSolution
 
-import re
-from copy import deepcopy
-from pprint import pprint
 from collections import defaultdict
 
 
@@ -13,110 +10,90 @@ def solve_one(self):
     h = len(input)
     w = len(input[0])
 
-    grid = [[c for c in line] for line in input]
-    directions = { '^': 0, '>': 1, 'v': 2, '<': 3 }
-    visited = set()
+    self.grid = [[c for c in line] for line in input]
+    self.directions = { '^': 0, '>': 1, 'v': 2, '<': 3 }
+    self.visited = set()
 
-    start = None
+    self.start = None
     for y in range(h):
         for x in range(w):
-            if grid[y][x] not in ['.', '#']:
-                start = (y, x, directions[grid[y][x]])
-                grid[y][x] = '.'
+            if self.grid[y][x] not in ['.', '#']:
+                self.start = (y, x, self.directions[self.grid[y][x]])
+                self.grid[y][x] = '.'
                 break
-        if start:
+        if self.start:
             break
 
-    y, x = (start[0], start[1])
-    direction = start[2]
+    y, x = (self.start[0], self.start[1])
+    direction = self.start[2]
 
     while True:
-        if direction == 0:
-            new_y, new_x = (y-1, x)
-        elif direction == 1:
-            new_y, new_x = (y, x+1)
-        elif direction == 2:
-            new_y, new_x = (y+1, x)
-        elif direction == 3:
-            new_y, new_x = (y, x-1)
+        new_y, new_x = next_pos(y, x, direction)
 
         if new_y < 0 or new_x < 0 or new_y >= h or new_x >= w:
             break
 
-        if grid[new_y][new_x] != '#':
+        if self.grid[new_y][new_x] != '#':
             y = new_y
             x = new_x
         else:
             direction = (direction + 1) % 4
 
-        visited.add((y, x))
+        self.visited.add((y, x))
 
-    return len(visited)
+    return len(self.visited)
 
 
 @BaseSolution.time_this
 def solve_two(self):
-    input = self.get_data()
-    h = len(input)
-    w = len(input[0])
-
-    grid = [[c for c in line] for line in input]
-    directions = { '^': 0, '>': 1, 'v': 2, '<': 3 }
-
     result_two = 0
 
-    start = None
-    for y in range(h):
-        for x in range(w):
-            if grid[y][x] not in ['.', '#']:
-                start = (y, x, directions[grid[y][x]])
-                grid[y][x] = '.'
+    h = len(self.grid)
+    w = len(self.grid[0])
+
+    for obstacle_y, obstacle_x in self.visited:
+        # Can skip start and existing obstacles, but doesn't impact performance much
+        # if (obstacle_y, obstacle_x) == (self.start[0], self.start[1]):
+        #     continue
+        # if self.grid[obstacle_y][obstacle_x] == '#':
+        #     continue
+        self.grid[obstacle_y][obstacle_x] = '#'
+        visited = defaultdict(list)
+        y, x, direction = (self.start[0], self.start[1], self.start[2])
+
+        while True:
+            new_y, new_x = next_pos(y, x, direction)
+
+            if new_y < 0 or new_x < 0 or new_y >= h or new_x >= w:
+                self.grid[obstacle_y][obstacle_x] = '.'
                 break
-        if start:
-            break
 
+            if self.grid[new_y][new_x] != '#':
+                visited[(y, x)].append(direction)
+                y = new_y
+                x = new_x
+            else:
+                direction = (direction + 1) % 4
 
-    grid = [[c for c in line] for line in input]
+            if direction in visited[(y, x)]:
+                result_two += 1
+                self.grid[obstacle_y][obstacle_x] = '.'
+                break
 
-    for block_y in range(h):
-        for block_x in range(w):
-            if (block_y, block_x) == (start[0], start[1]):
-                continue
-            if grid[block_y][block_x] == '#':
-                continue
-            grid[block_y][block_x] = '#'
-            visited = defaultdict(list)
-            y, x = (start[0], start[1])
-            direction = start[2]
-            while True:
-                if direction == 0:
-                    new_y, new_x = (y-1, x)
-                elif direction == 1:
-                    new_y, new_x = (y, x+1)
-                elif direction == 2:
-                    new_y, new_x = (y+1, x)
-                elif direction == 3:
-                    new_y, new_x = (y, x-1)
-
-                if new_y < 0 or new_x < 0 or new_y >= h or new_x >= w:
-                    grid[block_y][block_x] = '.'
-                    break
-
-                if grid[new_y][new_x] != '#':
-                    visited[(y, x)].append(direction)
-                    y = new_y
-                    x = new_x
-                else:
-                    direction = (direction + 1) % 4
-
-                if direction in visited[(y, x)]:
-                    result_two += 1
-                    grid[block_y][block_x] = '.'
-                    break
-            grid[block_y][block_x] = '.'
-
+        self.grid[obstacle_y][obstacle_x] = '.'
 
     return result_two
+
+
+def next_pos(y, x, direction):
+    if direction == 0:
+        return (y-1, x)
+    elif direction == 1:
+        return (y, x+1)
+    elif direction == 2:
+        return (y+1, x)
+    elif direction == 3:
+        return (y, x-1)
 
 
 class Solution(BaseSolution):
