@@ -30,8 +30,8 @@ fn solve(input: Vec<String>) {
                         n.split(' ').map(|i| i.parse::<i64>().unwrap()).collect()))
                   .unwrap();
 
-        let options_one: Vec<i64> = calc_one(&numbers);
-        let options_two: Vec<i64> = calc_two(&numbers);
+        let options_one: Vec<i64> = calc_one(numbers[0], &numbers, 1);
+        let options_two: Vec<i64> = calc_two(numbers[0], &numbers, 1);
 
         if options_one.contains(&test) {
             result_one += &test;
@@ -44,30 +44,30 @@ fn solve(input: Vec<String>) {
     println!("The answer for part 2 is: {}", result_two);
 }
 
-fn calc_one(numbers: &Vec<i64>) -> Vec<i64> {
-    match numbers.len() {
-        2 => vec![
-            numbers[0] + numbers[1],
-            numbers[0] * numbers[1]
+fn calc_one(base: i64, numbers: &[i64], index: usize) -> Vec<i64> {
+    match numbers.len() - index {
+        1 => vec![
+            base + numbers[index],
+            base * numbers[index]
         ],
         _ => [
-            calc_one(&[&[numbers[0] + numbers[1]], &numbers[2..]].concat()),
-            calc_one(&[&[numbers[0] * numbers[1]], &numbers[2..]].concat())
+            calc_one(base + numbers[index], &numbers, index+1),
+            calc_one(base * numbers[index], &numbers, index+1)
         ].concat()
     }
 }
 
-fn calc_two(numbers: &Vec<i64>) -> Vec<i64> {
-    match numbers.len() {
-        2 => vec![
-            numbers[0] + numbers[1],
-            numbers[0] * numbers[1],
-            numbers[0] * (10i64.pow(numbers[1].ilog10()+1)) + numbers[1]
+fn calc_two(base: i64, numbers: &[i64], index: usize) -> Vec<i64> {
+    match numbers.len() - index{
+        1 => vec![
+            base + numbers[index],
+            base * numbers[index],
+            base * (10i64.pow(numbers[index].ilog10()+1)) + numbers[index]
         ],
         _ => [
-            calc_two(&[&[numbers[0] + numbers[1]], &numbers[2..]].concat()),
-            calc_two(&[&[numbers[0] * numbers[1]], &numbers[2..]].concat()),
-            calc_two(&[&[numbers[0] * (10i64.pow(numbers[1].ilog10()+1)) + numbers[1]], &numbers[2..]].concat())
+            calc_two(base + numbers[index], &numbers, index+1),
+            calc_two(base * numbers[index], &numbers, index+1),
+            calc_two(base * (10i64.pow(numbers[index].ilog10()+1)) + numbers[index], &numbers, index+1)
         ].concat()
     }
 }
