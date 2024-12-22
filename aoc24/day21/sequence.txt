@@ -1,0 +1,5 @@
+A<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
+A  v <<   A >>  ^ A   <   A > A  v  A   <  ^ AA > A   < v  AAA >  ^ A
+A         <       A       ^   A     >        ^^   A        vvv      A
+A                 0           2                   9                 A
+          11      8           12
